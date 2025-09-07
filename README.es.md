@@ -66,14 +66,14 @@ Primario (URL más amigable — redirección raw de GitHub)
 
 ```bash
 wget -qO debian-btrfs-boot.sh https://github.com/dwilliam62/debian-btrfs-boot/raw/main/debian-btrfs-boot.sh
-chmod +x debian-btrfs-boot.sh
+chmod +x ./debian-btrfs-boot.sh
 ```
 
 Respaldo (raw.githubusercontent.com)
 
 ```bash
 wget -qO debian-btrfs-boot.sh https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh
-chmod +x debian-btrfs-boot.sh
+chmod +x ./debian-btrfs-boot.sh
 ```
 
 Enlaces del script:
