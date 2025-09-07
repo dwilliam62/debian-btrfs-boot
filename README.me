@@ -35,8 +35,25 @@ Resulting Btrfs layout
 
 ---
 
+Quick start (download via curl or wget)
+From the Debian installer shell (Ctrl+Alt+F2):
+
+```bash
+# Using curl
+curl -fsSL https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh -o debian-btrfs-boot.sh
+chmod +x debian-btrfs-boot.sh
+
+# Or using wget
+wget -qO debian-btrfs-boot.sh https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh
+chmod +x debian-btrfs-boot.sh
+```
+
+Script links:
+- Repo view: https://github.com/dwilliam62/debian-btrfs-boot/blob/main/debian-btrfs-boot.sh
+- Raw file:  https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh
+
 Usage
-1) From the Debian installer shell (Ctrl+Alt+F2), fetch or copy the script into a working dir.
+1) From the Debian installer shell (Ctrl+Alt+F2), fetch the script with curl or wget (see above) into a working dir.
 2) Run with confirmations (recommended):
 
 ```bash
