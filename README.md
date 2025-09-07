@@ -1,5 +1,7 @@
 # debian-btrfs-boot 🛠️✅
 
+Read this in: [English](README.md) | [Español](README.es.md)
+
 ❌🚧 DEVELOPMENT PREVIEW — DO NOT USE THIS SCRIPT AT THIS TIME 🚧❌
 This project is under active development. The script is not ready for real installs yet. Use at your own risk.
 
