@@ -69,6 +69,19 @@ confirm_exact() {
   [ "$_ans" = "$_expected" ]
 }
 
+confirm_yn() {
+  # $1 prompt -> expects Y or N
+  _prompt="$1"
+  printf "%b%s %s [Y/N]%b " "$MAGENTA" "$ICON_ASK" "$_prompt" "$RESET"
+  read -r _yn
+  echo "$_yn" >>"$LOG_FILE"
+  case "$_yn" in
+    Y|y) return 0 ;;
+    N|n) return 1 ;;
+    *) return 1 ;;
+  esac
+}
+
 # Defaults
 DRY_RUN="false"
 AUTO_YES="false"
@@ -178,6 +191,59 @@ esac
 # Choose compression policy: always enforce compress=zstd (do not preserve alternate compress settings)
 comp_opt="compress=zstd"
 BASE_BTRFS_OPTS=$(printf "%s,%s" "${clean_opts#,}" "$comp_opt" | sed 's/^,//;s/,,/,/g')
+
+# ------- Precheck for separate /home and /var mounts -------
+get_line() { awk -v mp="$1" '($0 !~ /^#/ && NF>=2 && $2==mp){print $0; exit}' "$TARGET_ROOT/etc/fstab"; }
+
+OOS_REASON=""
+CORRECTIONS_PREV=""
+CORRECTIONS_NEXT=""
+
+# /var as its own partition is outside scope of this script's design
+VAR_SPEC=$(get_field "/var") || true
+if [ -n "$VAR_SPEC" ] && [ "$VAR_SPEC" != "$ROOT_SPEC" ]; then
+  OOS_REASON="Detected separate /var at: $(get_line "/var")"
+fi
+
+# Targets we intend to manage as subvolumes on the root device
+for _mp in /home /var/log /var/cache; do
+  _spec=$(get_field "$_mp") || true
+  if [ -n "$_spec" ] && [ "$_spec" != "$ROOT_SPEC" ]; then
+    _prev_line=$(get_line "$_mp")
+    if [ -n "$CORRECTIONS_PREV" ]; then
+      CORRECTIONS_PREV="$CORRECTIONS_PREV\n$_prev_line"
+    else
+      CORRECTIONS_PREV="$_prev_line"
+    fi
+    case "$_mp" in
+      /home) _sub="@home" ;;
+      /.snapshots) _sub="@snapshots" ;;
+      /var/log) _sub="@log" ;;
+      /var/cache) _sub="@cache" ;;
+      *) _sub="@" ;;
+    esac
+    _next_line="$ROOT_SPEC $_mp btrfs $BASE_BTRFS_OPTS,subvol=$_sub 0 0"
+    if [ -n "$CORRECTIONS_NEXT" ]; then
+      CORRECTIONS_NEXT="$CORRECTIONS_NEXT\n$_next_line"
+    else
+      CORRECTIONS_NEXT="$_next_line"
+    fi
+  fi
+done
+
+if [ -n "$OOS_REASON" ]; then
+  log FAIL "$OOS_REASON"
+  die "Configuration outside the scope of this script (separate /var)."
+fi
+
+if [ -n "$CORRECTIONS_PREV" ]; then
+  log WARN "Detected mount points that will be corrected to Btrfs subvolumes on the root device:"
+  print_block "Current fstab lines:\n$CORRECTIONS_PREV"
+  print_block "Proposed changes:\n$CORRECTIONS_NEXT"
+  if ! confirm_yn "Apply these corrections?"; then
+    die "User declined to apply corrections; configuration outside the scope of this script."
+  fi
+fi
 
 # Confirmation: show current state
 log STEP "Planned Btrfs subvol layout:"
