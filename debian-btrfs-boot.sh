@@ -169,12 +169,8 @@ clean_opts=$(printf "%s" "${ROOT_OPTS:-defaults}" | awk -F, '{
 if [[ ",${clean_opts}," != *",noatime,"* ]]; then
   clean_opts="${clean_opts},noatime"
 fi
-# Choose compression: preserve if present else use compress=zstd
-if [[ "${ROOT_OPTS:-}" =~ (^|,)compress[^,]* ]]; then
-  comp_opt=$(printf "%s" "$ROOT_OPTS" | tr ',' '\n' | grep -E '^compress(=|$)' | head -n1)
-else
-  comp_opt="compress=zstd"
-fi
+# Choose compression policy: always enforce compress=zstd (do not preserve alternate compress settings)
+comp_opt="compress=zstd"
 BASE_BTRFS_OPTS=$(printf "%s,%s" "${clean_opts#,}" "$comp_opt" | sed 's/^,//;s/,,/,/g')
 
 # Confirmation: show current state

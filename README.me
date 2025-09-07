@@ -9,7 +9,7 @@ Author: Don Williams
 Highlights
 - ✅ Safe and idempotent: backs up fstab, previews changes, and requires explicit confirmations.
 - ⚠️ Guardrails: environment checks for Debian installer context, root, device types, and mount status.
-- 🧩 Flexible: preserves key fstab options (e.g., ssd, noatime, compress settings), while normalizing subvolumes.
+- 🧩 Flexible: preserves key fstab options (e.g., ssd, noatime) while normalizing subvolumes and forcing compress=zstd.
 - 📜 Detailed logs: install.TIMESTAMP.log with file contents and command results.
 - 🎨 Colorful UX: ANSI-colored messages with icons for clarity.
 
@@ -75,7 +75,7 @@ What the script does (high level)
 8) Re-mount EFI to /target/boot/efi
 9) Build new fstab entries
    - Preserves existing non-subvol and non-compress options
-   - Ensures noatime present; preserves compress if set, else uses compress=zstd
+   - Ensures noatime present; forces compress=zstd (overrides other compress settings)
    - Uses the same source specifier as the original root line (UUID=..., PARTUUID=..., LABEL=..., or /dev/...)
    - Sets dump/pass to 0 0 for btrfs entries
 10) Show proposed fstab changes, write to fstab.modified.TIMESTAMP
@@ -97,8 +97,8 @@ Plan review, corrections, and guardrails
   - If @ exists already, skip rename
   - Create subvolumes only if missing; do not fail if they already exist
 - Flexible options handling
-  - Preserve existing options like ssd, noatime, autodefrag, etc., while normalizing subvol= and compress options
-  - If the installer used compress without an algorithm, the script preserves that; otherwise defaults to compress=zstd
+  - Preserve existing options like ssd, noatime, autodefrag, etc., while normalizing subvol= options
+  - The script always sets compress=zstd (it does not preserve other compress values)
 - fstab fsck fields
   - Btrfs uses a no-op fsck; the script sets 0 0 for btrfs entries consistently
   - EFI line is preserved as-is

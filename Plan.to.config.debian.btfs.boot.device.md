@@ -4,187 +4,167 @@
 
 ## Created: 9/7/2025
 
-## Purpose: To properly configure a debian 12 or 13 boot drive w/btrfs
+## Purpose: Properly configure a Debian 12 or 13 boot drive with Btrfs subvolumes during install
 
 ```text
-To be used during the install of debian 12/13 with GPT partition and UEFI After
-user partitioned the drive in the GUI they will go to the CLI Curl/Wget this script to the
-system being installed. The system must be at the point where the files systems
-was created but before you start installing packages The script will unmount the current
-@rootfs partition, move @root to @, create and mount btrfs subvolumes
+Use during the Debian 12/13 install with GPT partitioning and UEFI. After
+partitioning the drive in the GUI, switch to the shell and fetch this script.
+Run it when filesystems are created and mounted (before package installation).
+The script will unmount the current @rootfs, rename @rootfs to @, create Btrfs
+subvolumes, remount them at the correct paths, and update /target/etc/fstab.
 ```
 
-## Use color coding and iconography to enhance appearance and highlight areas of > [!CAUTION]
+## Visuals
+- Use color coding and icons to highlight steps, warnings, and confirmations.
 
-## Create a detailed install log `install.DATE-TIME.log`
+## Detailed install log `install.DATE-TIME.log`
+- Show steps performed and their results
+- When you read a file, save the contents
+- When you modify a file, save the resulting contents
+- When you run a command, save the output to the log file
 
-- Show the steps performed and their results
-- When you read a file save the contents
-- When you modify a file save the contents of that saved file
-- When you run a command save the output to the log file
+## Mandatory checks — Don’t proceed if not met
+```text
+Debian 12 or Debian 13 installer
+GPT partitioning and UEFI firmware (/sys/firmware/efi present)
+/cdrom exists (installer media)
+Btrfs partition mounted at /target
+EFI (vfat) mounted at /target/boot/efi
+Initial root subvolume is @rootfs (if created by installer)
+```
 
-## Mandatory checks - Don't proceed if not met
+## Final Btrfs layout after modifications
+```text
+@            /
+@snapshots   /.snapshots
+@home        /home
+@log         /var/log
+@cache       /var/cache
+```
+
+## Determine the boot device and partitions
+- Store detected devices in:
+  - $BOOTDEVICE_P1 — EFI System Partition (first partition)
+  - $BOOTDEVICE_P2 — Root partition (second partition)
+  - $SWAPDEVICE    — If a swap partition is found
 
 ```text
-Debian 12 
-Debian 13 
-GPT partiton 
-/cdrom 
-BTRFS partion on / 
-/target    @rootfs
-/target/boot/efi  /boot/efi
+e.g.
+/dev/sda1, /dev/sda2
+/dev/vda1, /dev/vda2
+/dev/nvme0n1p1, /dev/nvme0n1p2
 ```
 
-## Final BTRFS layout after modifcations
+- $BOOTDEVICE_P1 should currently be mounted at /target/boot/efi
+- $BOOTDEVICE_P2 should currently be mounted at /target
+
+## Validate that /target/etc/fstab is as expected
+- Use flexible logic; the installer may set additional flags (e.g., ssd, autodefrag, noatime)
+- Enforce compression to compress=zstd (do not preserve a different compress value)
+- Check for Linux swap; if present save specifier in $SWAPDEVICE
 
 ```text
-@                   /
-@snapshots          /.snapshots 
-@home               /home
-@log                /var/logs
-@var                /var/cache
+Find the current specifier for / in /target/etc/fstab; typically it looks like:
+UUID=XXXXXXXXXXXXXXX / btrfs defaults,subvol=@rootfs 0 0
+Find the current specifier for /boot/efi; typically it looks like:
+UUID=XXXXXXXXXXXXXXX /boot/efi vfat umask=0077 0 1
 ```
 
-## First determine the boot device and partitions
+## If validations fail, exit with an error message
+- Indicate which checks failed
+  - can’t find $BOOTDEVICE_P1
+  - can’t find $BOOTDEVICE_P2
+  - partitions not mounted or mounted at unexpected paths
+  - /target/etc/fstab not found
+  - /target/etc/fstab cannot determine devices
 
-- Saved in:
-- $BOOTDEVICE-P1 For first partition
-- $BOOTDEVICE-P2 For 2nd partition
-- $SWAPDEVICE If a swap partiton if found
-
-```text
-ie. 
-/dev/sda1,/dev/sda2 
-/dev/vda1,/dev/vda2
-/dev/nvme0n1p1,/dev/nvmen1p2
-```
-
-- $BOOTDEVICE-P1 should currently mounted on /target/boot/efi
-- $BOOTDEVICE-P2 should currently be mounted on /target
-
-## Validate that the /etc/fstab is as expected
-
-- Use flexible logic. As user can set additional flags in the debian installer
-- I.e. ssd,or compress.
-- If compression is set in the installer the flag changes to compress not
-  compress=zstd
-- Check for Linux swap if exists save swap info in $SWAPDEVICE
-
-```text
-Find the current UUID for $BOOTDEVICE-P2 /etc/fstab it will be 
-UUID=XXXXXXXXXXXXXXX / btrfs defaults,subvol=#@rootfs 0 0 
-Find the current UUID for $BOOTDEVICE-P1 it will be 
-UUID=XXXXXXXXXXXXXXX /boot/efi   vfat  umask=0077   0  1
-```
-
-## If validations fail exit with error message
-
-- Indicate what what checks failed
-- cant find $BOOTDEVICE-P1
-- cant find $BOOTDEVICE-P2
-- Partitions not mounted
-- Partitons not mounted where expected
-- /etc/fstab not found
-- /etc/fstab can't determine devices
-- etc
-
-## Print out results for confirmation
-
-- Display current /etc/fstab in nice formatting
-- Dispaly detected values for
-- $BOOTDEVICE-P1
-- $BOOTDEVICE-P2
+## Print results for confirmation
+- Display current /target/etc/fstab (nicely formatted)
+- Display detected values for:
+  - $BOOTDEVICE_P1
+  - $BOOTDEVICE_P2
 
 ## User must confirm before proceeding
+- Case-sensitive: the user must type `YES`
+- Otherwise exit
 
-- case sensitive `YES`
-- otherwise exit `
-
-## Unmount current $BOOTDEVICE-P1 and $BOOTDEVICE-P2
-
-```text
+## Unmount current $BOOTDEVICE_P1 and $BOOTDEVICE_P2
+```bash
 umount /target/boot/efi
-umount /target/
-mmount $BOOTDEVICE-P1 /mnt
+umount /target
 ```
 
-## Move @rootfs to @
+## Mount the Btrfs top-level and rename subvolumes
+- Mount the top-level Btrfs (subvolid=5) to a work directory (e.g., /mnt)
+- If @rootfs exists and @ does not, rename @rootfs to @
 
-```text
-mv @rootfs @
+```bash
+mount -o subvolid=5 $BOOTDEVICE_P2 /mnt
+if [ -d /mnt/@rootfs ] && [ ! -e /mnt/@ ]; then
+  mv /mnt/@rootfs /mnt/@
+fi
+umount /mnt
 ```
 
-## Create the btrfs subvolumes
-
-```text
-btrfs su cr @home 
-btrfs su cr @snapshots 
-btrfs su cr @log 
-btrfs su cr @cache
+## Create the Btrfs subvolumes (idempotent)
+```bash
+mount -o subvolid=5 $BOOTDEVICE_P2 /mnt
+btrfs subvolume create /mnt/@       || true
+btrfs subvolume create /mnt/@home   || true
+btrfs subvolume create /mnt/@snapshots || true
+btrfs subvolume create /mnt/@log    || true
+btrfs subvolume create /mnt/@cache  || true
+umount /mnt
 ```
 
 ## Final layout
-
 ```text
-@                   /
-@snapshots          /.snapshots 
-@home               /home
-@log                /var/log
-@cache              /var/cache
+@            /
+@snapshots   /.snapshots
+@home        /home
+@log         /var/log
+@cache       /var/cache
 ```
 
-## Subvolumes: Create btrfs subvolumes and mount them and /boot/efi
-
-```text
-mount -o noatime,compress=zstd,subvol=@ $BOOTDEVICE-P2 /target 
-mkdir -p /target/boot/efi 
-mkdir -p /target/home 
-mkdir -p /target/.snapshots 
-mkdir -p /target/var/log 
-mkdir -p /target/var/cache 
-mount -o noatime,compress=zstd,subvol=@home $BOOTDEVICE-P2 /target/home
-mount -o noatime,compress=zstd,subvol=@snapshots $BOOTDEVICE-P2 /target/.snapshots
-mount -o noatime,compress=zstd,subvol=@log $BOOTDEVICE-P2 /target/var/log
-mount -o noatime,compress=zstd,subvol=@cache $BOOTDEVICE-P2 /target/var/cache
-mount $BOOTDEVICE-P1 /target/boot/efi
+## Mount subvolumes and /boot/efi
+```bash
+mount -o noatime,compress=zstd,subvol=@ $BOOTDEVICE_P2 /target
+mkdir -p /target/boot/efi /target/home /target/.snapshots /target/var/log /target/var/cache
+mount -o noatime,compress=zstd,subvol=@home      $BOOTDEVICE_P2 /target/home
+mount -o noatime,compress=zstd,subvol=@snapshots $BOOTDEVICE_P2 /target/.snapshots
+mount -o noatime,compress=zstd,subvol=@log       $BOOTDEVICE_P2 /target/var/log
+mount -o noatime,compress=zstd,subvol=@cache     $BOOTDEVICE_P2 /target/var/cache
+mount $BOOTDEVICE_P1 /target/boot/efi
 ```
 
-## Find the current UUID for $BOOTDEVICE-P2 in /target/etc/fstb
-
+## Find current UUID/specifiers in /target/etc/fstab
 ```text
+Root line example:
 UUID=XXXXXXXXXXXXXXX / btrfs defaults,subvol=@rootfs 0 0
+EFI line example:
+UUID=XXXXXXXXXXXXXXX /boot/efi vfat umask=0077 0 1
 ```
 
-## Find the current UUID for $BOOTDEVICE-P1 in /target/etc/fstab
-
-```text
-UUID=XXXXXXXXXXXXXXX /boot/efi   vfat  umask=0077   0  1
-```
-
-## Backup the current /target/etc/fstab file /target/etc/fstab.date.time.backup
+## Back up /target/etc/fstab
+- Save a timestamped backup: /target/etc/fstab.DATE.TIME.backup
 
 ## Modify /target/etc/fstab
+- Replace root and related mountpoints with enforced compress=zstd and 0 0 pass fields
+- Preserve other (non-subvol, non-compress) options such as ssd, noatime, autodefrag
 
 ```text
-UUID=XXXXXXXXXXXXXXX / btrfs noatime,compress=ztd,subvol=@ 0 1 
-UUID=XXXXXXXXXXXXXXX /home btrfs noatime,compress=ztd,subvol=@home 0 2 
-UUID=XXXXXXXXXXXXXXX /.snapshots btrfs noatime,compress=ztd,subvol=@snapshots 0 2 
-UUID=XXXXXXXXXXXXXXX /var/log btrfs noatime,compress=ztd,subvol=@log 0 2 
-UUID=XXXXXXXXXXXXXXX /var/cache btrfs noatime,compress=ztd,subvol=@cache 0 2
+UUID=XXXXXXXXXXXXXXX /           btrfs noatime,compress=zstd,subvol=@          0 0
+UUID=XXXXXXXXXXXXXXX /home       btrfs noatime,compress=zstd,subvol=@home      0 0
+UUID=XXXXXXXXXXXXXXX /.snapshots btrfs noatime,compress=zstd,subvol=@snapshots 0 0
+UUID=XXXXXXXXXXXXXXX /var/log    btrfs noatime,compress=zstd,subvol=@log       0 0
+UUID=XXXXXXXXXXXXXXX /var/cache  btrfs noatime,compress=zstd,subvol=@cache     0 0
 ```
 
-## Print out the modified /target/etc/fstab file
-
-## User must confirm modifications are correct
-
-- They must answer "Proceed"
-- Case sensitive
-- If incorrect print correct response "Proceed"
-- on 2nd failure attempt
-- Move the modified /target/etc/fstab to /target/etc/fstab.modified.date.time
-- copy the backup /target/etc/fstab.date.time.backup to /target/etc/fstab
-- Print "Reverting fstab file... "
-- exit 1 back to shell
-- On success print "Modifcation succesfull -- Press CTRL + ALT + F1 to return to
-  installation"
-- exit 0 back to shell
+## Show the modified /target/etc/fstab and confirm
+- The user must answer "Proceed" (case-sensitive) to apply changes
+- On second failure attempt:
+  - Move the modified file to /target/etc/fstab.modified.DATE.TIME
+  - Restore from /target/etc/fstab.DATE.TIME.backup
+  - Print "Reverting fstab file..." and exit 1
+- On success print: "Modification successful — Press CTRL+ALT+F1 to return to the installer"
+- Exit 0
