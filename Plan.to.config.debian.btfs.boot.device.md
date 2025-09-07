@@ -6,6 +6,9 @@
 
 ## Purpose: Properly configure a Debian 12 or 13 boot drive with Btrfs subvolumes during install
 
+❌🚧 DEVELOPMENT PREVIEW — DO NOT USE THIS SCRIPT AT THIS TIME 🚧❌
+This plan and the script are under active development and not yet ready for production installs.
+
 ```text
 Use during the Debian 12/13 install with GPT partitioning and UEFI. After
 partitioning the drive in the GUI, switch to the shell and fetch this script
@@ -16,6 +19,18 @@ update /target/etc/fstab.
 
 Fetch commands (choose one):
 
+Primary (friendlier URL — GitHub raw redirect)
+```bash
+# curl
+curl -fsSL https://github.com/dwilliam62/debian-btrfs-boot/raw/main/debian-btrfs-boot.sh -o debian-btrfs-boot.sh
+chmod +x debian-btrfs-boot.sh
+
+# wget
+wget -qO debian-btrfs-boot.sh https://github.com/dwilliam62/debian-btrfs-boot/raw/main/debian-btrfs-boot.sh
+chmod +x debian-btrfs-boot.sh
+```
+
+Backup (raw.githubusercontent.com)
 ```bash
 # curl
 curl -fsSL https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh -o debian-btrfs-boot.sh
@@ -28,7 +43,7 @@ chmod +x debian-btrfs-boot.sh
 
 Script links:
 - Repo view: https://github.com/dwilliam62/debian-btrfs-boot/blob/main/debian-btrfs-boot.sh
-- Raw file:  https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh
+- Raw file (backup):  https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh
 ```
 
 ## Visuals

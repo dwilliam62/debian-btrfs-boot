@@ -1,5 +1,8 @@
 # debian-btrfs-boot 🛠️✅
 
+❌🚧 DEVELOPMENT PREVIEW — DO NOT USE THIS SCRIPT AT THIS TIME 🚧❌
+This project is under active development. The script is not ready for real installs yet. Use at your own risk.
+
 Configure a Debian 12/13 system (during install) to use Btrfs subvolumes for /, /home, /.snapshots, /var/log, and /var/cache. This repo includes a robust script with safety checks, clear colored output, icons, and detailed logging.
 
 Author: Don Williams
@@ -38,19 +41,31 @@ Resulting Btrfs layout
 Quick start (download via curl or wget)
 From the Debian installer shell (Ctrl+Alt+F2):
 
+Primary (friendlier URL — GitHub raw redirect)
 ```bash
-# Using curl
+# curl
+curl -fsSL https://github.com/dwilliam62/debian-btrfs-boot/raw/main/debian-btrfs-boot.sh -o debian-btrfs-boot.sh
+chmod +x debian-btrfs-boot.sh
+
+# wget
+wget -qO debian-btrfs-boot.sh https://github.com/dwilliam62/debian-btrfs-boot/raw/main/debian-btrfs-boot.sh
+chmod +x debian-btrfs-boot.sh
+```
+
+Backup (raw.githubusercontent.com)
+```bash
+# curl
 curl -fsSL https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh -o debian-btrfs-boot.sh
 chmod +x debian-btrfs-boot.sh
 
-# Or using wget
+# wget
 wget -qO debian-btrfs-boot.sh https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh
 chmod +x debian-btrfs-boot.sh
 ```
 
 Script links:
 - Repo view: https://github.com/dwilliam62/debian-btrfs-boot/blob/main/debian-btrfs-boot.sh
-- Raw file:  https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh
+- Raw file (backup):  https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh
 
 Usage
 1) From the Debian installer shell (Ctrl+Alt+F2), fetch the script with curl or wget (see above) into a working dir.
