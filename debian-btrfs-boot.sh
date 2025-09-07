@@ -195,14 +195,36 @@ BASE_BTRFS_OPTS=$(printf "%s,%s" "${clean_opts#,}" "$comp_opt" | sed 's/^,//;s/,
 # ------- Precheck for separate /home and /var mounts -------
 get_line() { awk -v mp="$1" '($0 !~ /^#/ && NF>=2 && $2==mp){print $0; exit}' "$TARGET_ROOT/etc/fstab"; }
 
-OOS_REASON=""
 CORRECTIONS_PREV=""
 CORRECTIONS_NEXT=""
+REMOVE_VAR="false"
 
-# /var as its own partition is outside scope of this script's design
+# Detect separate /var partition
 VAR_SPEC=$(get_field "/var") || true
 if [ -n "$VAR_SPEC" ] && [ "$VAR_SPEC" != "$ROOT_SPEC" ]; then
-  OOS_REASON="Detected separate /var at: $(get_line "/var")"
+  _var_line=$(get_line "/var")
+  log WARN "A separate /var partition was detected:"
+  print_block "$_var_line"
+  log WARN "Best-practice Btrfs layout uses subvolumes (e.g., @log, @cache) under the root Btrfs."
+  log WARN "This script can stop mounting the separate /var partition and use Btrfs subvolumes instead."
+  log WARN "No data will be deleted by this script, but the /var partition will NOT be mounted in the installed system."
+  log WARN "You can still mount it manually later to recover data if needed."
+  if confirm_yn "Proceed to IGNORE the separate /var partition and use Btrfs subvolumes?"; then
+    REMOVE_VAR="true"
+    # Queue removal display (for preview only)
+    if [ -n "$CORRECTIONS_PREV" ]; then
+      CORRECTIONS_PREV="$CORRECTIONS_PREV\n$_var_line"
+    else
+      CORRECTIONS_PREV="$_var_line"
+    fi
+    if [ -n "$CORRECTIONS_NEXT" ]; then
+      CORRECTIONS_NEXT="$CORRECTIONS_NEXT\n# REMOVE /var mount line"
+    else
+      CORRECTIONS_NEXT="# REMOVE /var mount line"
+    fi
+  else
+    die "User declined /var migration; configuration outside the scope of this script."
+  fi
 fi
 
 # Targets we intend to manage as subvolumes on the root device
@@ -230,11 +252,6 @@ for _mp in /home /var/log /var/cache; do
     fi
   fi
 done
-
-if [ -n "$OOS_REASON" ]; then
-  log FAIL "$OOS_REASON"
-  die "Configuration outside the scope of this script (separate /var)."
-fi
 
 if [ -n "$CORRECTIONS_PREV" ]; then
   log WARN "Detected mount points that will be corrected to Btrfs subvolumes on the root device:"
@@ -371,7 +388,7 @@ EOF
 )
 
 # Filter out old root/home/.snapshots/var/log/var/cache entries; keep others (incl. EFI and swap)
-FSTAB_NEW=$(awk 'BEGIN{skip["/"]=1;skip["/home"]=1;skip["/.snapshots"]=1;skip["/var/log"]=1;skip["/var/cache"]=1}
+FSTAB_NEW=$(awk -v rmvar="$REMOVE_VAR" 'BEGIN{skip["/"]=1;skip["/home"]=1;skip["/.snapshots"]=1;skip["/var/log"]=1;skip["/var/cache"]=1; if (rmvar=="true") skip["/var"]=1}
   /^#/ || NF==0 { print; next }
   { mp=$2 } (mp in skip){ next } { print }' "$TARGET_ROOT/etc/fstab")
 
