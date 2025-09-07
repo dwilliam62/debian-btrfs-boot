@@ -66,6 +66,8 @@ Primary (friendlier URL — GitHub raw redirect)
 ```bash
 wget -qO debian-btrfs-boot.sh https://github.com/dwilliam62/debian-btrfs-boot/raw/main/debian-btrfs-boot.sh
 chmod +x ./debian-btrfs-boot.sh
+# Preview without making changes
+./debian-btrfs-boot.sh --dry-run
 ```
 
 Backup (raw.githubusercontent.com)
@@ -73,6 +75,8 @@ Backup (raw.githubusercontent.com)
 ```bash
 wget -qO debian-btrfs-boot.sh https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh
 chmod +x ./debian-btrfs-boot.sh
+# Preview without making changes
+./debian-btrfs-boot.sh --dry-run
 ```
 
 Script links:

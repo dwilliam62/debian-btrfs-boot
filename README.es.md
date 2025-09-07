@@ -67,6 +67,8 @@ Primario (URL más amigable — redirección raw de GitHub)
 ```bash
 wget -qO debian-btrfs-boot.sh https://github.com/dwilliam62/debian-btrfs-boot/raw/main/debian-btrfs-boot.sh
 chmod +x ./debian-btrfs-boot.sh
+# Previsualizar sin cambios
+./debian-btrfs-boot.sh --dry-run
 ```
 
 Respaldo (raw.githubusercontent.com)
@@ -74,6 +76,8 @@ Respaldo (raw.githubusercontent.com)
 ```bash
 wget -qO debian-btrfs-boot.sh https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh
 chmod +x ./debian-btrfs-boot.sh
+# Previsualizar sin cambios
+./debian-btrfs-boot.sh --dry-run
 ```
 
 Enlaces del script:
