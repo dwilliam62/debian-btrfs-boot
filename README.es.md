@@ -31,6 +31,11 @@ Destacados
   resultados de comandos.
 - 🎨 UX con color: mensajes con secuencias ANSI e iconos para mayor claridad.
 
+Capturas de pantalla
+
+![Captura 1](img/ScreenShot-1.png)
+![Captura 2](img/ScreenShot-2.png)
+
 ---
 
 Cuándo ejecutar Ejecute este script desde la consola del instalador de Debian

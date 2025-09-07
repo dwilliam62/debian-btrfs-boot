@@ -31,6 +31,11 @@ Highlights
   results.
 - 🎨 Colorful UX: ANSI-colored messages with icons for clarity.
 
+Screenshots
+
+![Screenshot 1](img/ScreenShot-1.png)
+![Screenshot 2](img/ScreenShot-2.png)
+
 ---
 
 When to run Run this script from the Debian Installer shell after you have
