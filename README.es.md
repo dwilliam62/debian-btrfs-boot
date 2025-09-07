@@ -123,6 +123,11 @@ Registro (logging)
   usuario root del sistema de destino (p. ej.,
   /target/root/install.YYYY-MM-DD_HH-MM-SS.log) para revisión posterior.
 
+Seguridad de datos y comportamiento de /var
+- El script no elimina ni formatea particiones. Solo actualiza /target/etc/fstab y realiza remontajes.
+- Si existe una partición /var separada en fstab, se preserva y seguirá auto-montándose por defecto.
+- El script ofrece una migración opcional a subvolúmenes Btrfs para /var/log y /var/cache (y para eliminar la entrada separada de /var) — esto solo ocurre si usted lo confirma explícitamente.
+
 ---
 
 Qué hace el script (alto nivel)

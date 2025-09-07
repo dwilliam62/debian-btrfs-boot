@@ -122,6 +122,11 @@ Logging
   system’s root user directory (e.g.,
   /target/root/install.YYYY-MM-DD_HH-MM-SS.log) for later review.
 
+Data safety and /var behavior
+- The script does not delete or format any partitions. It only updates /target/etc/fstab and remounts.
+- If a separate /var partition is present in fstab, it is preserved and will continue to auto-mount by default.
+- The script offers an optional migration to Btrfs subvolumes for /var/log and /var/cache (and to remove a separate /var entry) — this happens only if you explicitly confirm.
+
 ---
 
 What the script does (high level)

@@ -223,7 +223,7 @@ if [ -n "$VAR_SPEC" ] && [ "$VAR_SPEC" != "$ROOT_SPEC" ]; then
       CORRECTIONS_NEXT="# REMOVE /var mount line"
     fi
   else
-    die "User declined /var migration; configuration outside the scope of this script."
+    log INFO "User declined /var migration; leaving existing /var mount intact. Proceeding with other Btrfs subvolume setup."
   fi
 fi
 
