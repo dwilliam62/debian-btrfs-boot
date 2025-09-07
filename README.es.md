@@ -6,6 +6,11 @@ Leer esto en: [English](README.md) | [Español](README.es.md)
 
 - Este proyecto está en desarrollo activo. Úselo bajo su propio riesgo.
 
+SUPUESTOS IMPORTANTES
+- Se requiere firmware UEFI y tabla de particiones GPT.
+- Un único punto de montaje raíz (/) en una sola partición Btrfs (no se esperan particiones separadas para root/home/var).
+- Sin espacio de intercambio (swap). Si existe swap, este script puede no aplicar.
+
 Configura un sistema Debian 12/13 (durante la instalación) para usar
 subvolúmenes Btrfs para /, /home, /.snapshots, /var/log y /var/cache. Este
 repositorio incluye un script robusto con comprobaciones de seguridad, salida

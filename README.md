@@ -6,6 +6,11 @@ Read this in: [English](README.md) | [Español](README.es.md)
 
 - This project is under active development. Use at your own risk.
 
+IMPORTANT ASSUMPTIONS
+- UEFI firmware and GPT partition table are required.
+- Single root mount point (/) on one Btrfs partition (no separate root/home/var partitions expected).
+- No swap space configured. If swap exists, this script may not apply.
+
 Configure a Debian 12/13 system (during install) to use Btrfs subvolumes for /,
 /home, /.snapshots, /var/log, and /var/cache. This repo includes a robust script
 with safety checks, clear colored output, icons, and detailed logging.
