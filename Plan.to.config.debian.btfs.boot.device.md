@@ -12,31 +12,21 @@ This plan and the script are under active development and not yet ready for prod
 ```text
 Use during the Debian 12/13 install with GPT partitioning and UEFI. After
 partitioning the drive in the GUI, switch to the shell and fetch this script
-(via curl or wget). Run it when filesystems are created and mounted (before
+(via wget). Run it when filesystems are created and mounted (before
 package installation). The script will unmount the current @rootfs, rename
 @rootfs to @, create Btrfs subvolumes, remount them at the correct paths, and
 update /target/etc/fstab.
 
-Fetch commands (choose one):
+Fetch commands:
 
 Primary (friendlier URL — GitHub raw redirect)
 ```bash
-# curl
-curl -fsSL https://github.com/dwilliam62/debian-btrfs-boot/raw/main/debian-btrfs-boot.sh -o debian-btrfs-boot.sh
-chmod +x debian-btrfs-boot.sh
-
-# wget
 wget -qO debian-btrfs-boot.sh https://github.com/dwilliam62/debian-btrfs-boot/raw/main/debian-btrfs-boot.sh
 chmod +x debian-btrfs-boot.sh
 ```
 
 Backup (raw.githubusercontent.com)
 ```bash
-# curl
-curl -fsSL https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh -o debian-btrfs-boot.sh
-chmod +x debian-btrfs-boot.sh
-
-# wget
 wget -qO debian-btrfs-boot.sh https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh
 chmod +x debian-btrfs-boot.sh
 ```
