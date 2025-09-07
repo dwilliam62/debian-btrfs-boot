@@ -2,11 +2,9 @@
 
 Leer esto en: [English](README.md) | [Español](README.es.md)
 
-❌🚧 VERSIÓN EN DESARROLLO — NO USE ESTE SCRIPT POR AHORA 🚧❌ Este proyecto
-está en desarrollo activo. El script aún no está listo para instalaciones
-reales. Úselo bajo su propio riesgo.
+❌🚧 VERSIÓN EN DESARROLLO — NO USE ESTE SCRIPT POR AHORA 🚧❌
 
-Autor: Don Williams
+- Este proyecto está en desarrollo activo. Úselo bajo su propio riesgo.
 
 Configura un sistema Debian 12/13 (durante la instalación) para usar
 subvolúmenes Btrfs para /, /home, /.snapshots, /var/log y /var/cache. Este
@@ -33,8 +31,7 @@ Destacados
 
 Capturas de pantalla
 
-![Captura 1](img/ScreenShot-1.png)
-![Captura 2](img/ScreenShot-2.png)
+![Captura 1](img/ScreenShot-1.png) ![Captura 2](img/ScreenShot-2.png)
 
 ---
 
