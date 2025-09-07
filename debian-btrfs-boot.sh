@@ -113,7 +113,6 @@ require_cmd grep
 require_cmd mount
 require_cmd umount
 require_cmd btrfs
-require_cmd tee
 
 [ "$(id -u)" -eq 0 ] || die "Must run as root"
 
