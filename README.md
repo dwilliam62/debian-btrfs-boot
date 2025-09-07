@@ -2,31 +2,43 @@
 
 Read this in: [English](README.md) | [Español](README.es.md)
 
-❌🚧 DEVELOPMENT PREVIEW — DO NOT USE THIS SCRIPT AT THIS TIME 🚧❌
-This project is under active development. The script is not ready for real installs yet. Use at your own risk.
+❌🚧 DEVELOPMENT PREVIEW — DO NOT USE THIS SCRIPT AT THIS TIME 🚧❌ This project
+is under active development. The script is not ready for real installs yet. Use
+at your own risk.
 
 Author: Don Williams
 
-Configure a Debian 12/13 system (during install) to use Btrfs subvolumes for /, /home, /.snapshots, /var/log, and /var/cache. This repo includes a robust script with safety checks, clear colored output, icons, and detailed logging.
+Configure a Debian 12/13 system (during install) to use Btrfs subvolumes for /,
+/home, /.snapshots, /var/log, and /var/cache. This repo includes a robust script
+with safety checks, clear colored output, icons, and detailed logging.
 
+# This was created from the YouTube Video https://www.youtube.com/watch?v=_zC4S7TA1GI
 
-## This was created from the YouTube Video  https://www.youtube.com/watch?v=_zC4S7TA1GI 
-- by JustAGuyLinux https://www.youtube.com/@JustAGuyLinux 
+- by JustAGuyLinux https://www.youtube.com/@JustAGuyLinux
+
 ---
 
 Highlights
-- ✅ Safe and idempotent: backs up fstab, previews changes, and requires explicit confirmations.
-- ⚠️ Guardrails: environment checks for Debian installer context, root, device types, and mount status.
-- 🧩 Flexible: preserves key fstab options (e.g., ssd, noatime) while normalizing subvolumes and forcing compress=zstd.
-- 📜 Detailed logs: install.TIMESTAMP.log with file contents and command results.
+
+- ✅ Safe and idempotent: backs up fstab, previews changes, and requires
+  explicit confirmations.
+- ⚠️ Guardrails: environment checks for Debian installer context, root, device
+  types, and mount status.
+- 🧩 Flexible: preserves key fstab options (e.g., ssd, noatime) while
+  normalizing subvolumes and forcing compress=zstd.
+- 📜 Detailed logs: install.TIMESTAMP.log with file contents and command
+  results.
 - 🎨 Colorful UX: ANSI-colored messages with icons for clarity.
 
 ---
 
-When to run
-Run this script from the Debian Installer shell after you have partitioned and formatted the target drive, and the installer has mounted the target system at /target and the EFI partition at /target/boot/efi. This is typically before the package installation step.
+When to run Run this script from the Debian Installer shell after you have
+partitioned and formatted the target drive, and the installer has mounted the
+target system at /target and the EFI partition at /target/boot/efi. This is
+typically before the package installation step.
 
 Expected environment:
+
 - Debian 12 or 13 installer
 - GPT partitioning and UEFI firmware (/sys/firmware/efi present)
 - /cdrom exists
@@ -35,36 +47,43 @@ Expected environment:
 ---
 
 Resulting Btrfs layout
-- @            -> /
-- @home        -> /home
-- @snapshots   -> /.snapshots
-- @log         -> /var/log
-- @cache       -> /var/cache
+
+- @ -> /
+- @home -> /home
+- @snapshots -> /.snapshots
+- @log -> /var/log
+- @cache -> /var/cache
 
 ---
 
-Quick start (download via wget)
-From the Debian installer shell (Ctrl+Alt+F2):
+Quick start (download via wget) From the Debian installer shell (Ctrl+Alt+F2):
 
 Primary (friendlier URL — GitHub raw redirect)
+
 ```bash
 wget -qO debian-btrfs-boot.sh https://github.com/dwilliam62/debian-btrfs-boot/raw/main/debian-btrfs-boot.sh
 chmod +x debian-btrfs-boot.sh
 ```
 
 Backup (raw.githubusercontent.com)
+
 ```bash
 wget -qO debian-btrfs-boot.sh https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh
 chmod +x debian-btrfs-boot.sh
 ```
 
 Script links:
-- Repo view: https://github.com/dwilliam62/debian-btrfs-boot/blob/main/debian-btrfs-boot.sh
-- Raw file (backup):  https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh
+
+- Repo view:
+  https://github.com/dwilliam62/debian-btrfs-boot/blob/main/debian-btrfs-boot.sh
+- Raw file (backup):
+  https://raw.githubusercontent.com/dwilliam62/debian-btrfs-boot/main/debian-btrfs-boot.sh
 
 Usage
-1) From the Debian installer shell (Ctrl+Alt+F2), fetch the script with wget (see above) into a working dir.
-2) Run with confirmations (recommended):
+
+1. From the Debian installer shell (Ctrl+Alt+F2), fetch the script with wget
+   (see above) into a working dir.
+2. Run with confirmations (recommended):
 
 ```bash
 # Preview actions, no changes
@@ -78,55 +97,71 @@ Usage
 ```
 
 Options:
-- --dry-run         Show what would happen without making changes
-- -y, --yes         Assume "YES" to proceed and "Proceed" to finalize
-- --target PATH     Target root mount point (default: /target)
+
+- --dry-run Show what would happen without making changes
+- -y, --yes Assume "YES" to proceed and "Proceed" to finalize
+- --target PATH Target root mount point (default: /target)
 
 Logging
-- A detailed log is written to install.YYYY-MM-DD_HH-MM-SS.log in the current working directory.
-- On successful completion (non-dry-run), the log is copied to the target system’s root user directory (e.g., /target/root/install.YYYY-MM-DD_HH-MM-SS.log) for later review.
+
+- A detailed log is written to install.YYYY-MM-DD_HH-MM-SS.log in the current
+  working directory.
+- On successful completion (non-dry-run), the log is copied to the target
+  system’s root user directory (e.g.,
+  /target/root/install.YYYY-MM-DD_HH-MM-SS.log) for later review.
 
 ---
 
 What the script does (high level)
-1) Preflight checks (❌ abort on failure)
-   - Root privileges, Debian installer context (/cdrom), /target and /target/boot/efi are mounted
+
+1. Preflight checks (❌ abort on failure)
+   - Root privileges, Debian installer context (/cdrom), /target and
+     /target/boot/efi are mounted
    - Root fstype is btrfs; EFI fstype is vfat
    - /target/etc/fstab exists; parsed for current device specifiers and options
-2) Confirmation (❓ type YES)
+2. Confirmation (❓ type YES)
    - Shows detected devices and planned layout
-3) Back up fstab (✅ safe copy to /target/etc/fstab.TIMESTAMP.backup)
-4) Unmount /target/boot/efi and /target (⚠️ with clear messaging)
-5) Mount top-level btrfs (subvolid=5) at /mnt
-6) Rename @rootfs -> @ if needed; create @home, @snapshots, @log, @cache (idempotent)
-7) Mount new subvolumes at /target
-8) Re-mount EFI to /target/boot/efi
-9) Build new fstab entries
+3. Back up fstab (✅ safe copy to /target/etc/fstab.TIMESTAMP.backup)
+4. Unmount /target/boot/efi and /target (⚠️ with clear messaging)
+5. Mount top-level btrfs (subvolid=5) at /mnt
+6. Rename @rootfs -> @ if needed; create @home, @snapshots, @log, @cache
+   (idempotent)
+7. Mount new subvolumes at /target
+8. Re-mount EFI to /target/boot/efi
+9. Build new fstab entries
    - Preserves existing non-subvol and non-compress options
-   - Ensures noatime present; forces compress=zstd (overrides other compress settings)
-   - Uses the same source specifier as the original root line (UUID=..., PARTUUID=..., LABEL=..., or /dev/...)
+   - Ensures noatime present; forces compress=zstd (overrides other compress
+     settings)
+   - Uses the same source specifier as the original root line (UUID=...,
+     PARTUUID=..., LABEL=..., or /dev/...)
    - Sets dump/pass to 0 0 for btrfs entries
-10) Show proposed fstab changes, write to fstab.modified.TIMESTAMP
-11) Final confirmation (❓ type Proceed) or revert
-   - On abort, restores original fstab and saves modified copy as reverted
-12) Install modified fstab and instruct to return to installer (✅ success)
+10. Show proposed fstab changes, write to fstab.modified.TIMESTAMP
+11. Final confirmation (❓ type Proceed) or revert
+
+- On abort, restores original fstab and saves modified copy as reverted
+
+12. Install modified fstab and instruct to return to installer (✅ success)
 
 ---
 
 Plan review, corrections, and guardrails
+
 - Correct command typos and paths
   - mmount -> mount
   - /target/etc/fstb -> /target/etc/fstab
   - compress=ztd -> compress=zstd
   - /var/logs -> /var/log
 - Subvolume rename sequence
-  - Must mount the btrfs top-level (subvolid=5) to a work dir (e.g., /mnt) before renaming @rootfs to @ via mv /mnt/@rootfs /mnt/@
+  - Must mount the btrfs top-level (subvolid=5) to a work dir (e.g., /mnt)
+    before renaming @rootfs to @ via mv /mnt/@rootfs /mnt/@
 - Idempotency and detection
   - If @ exists already, skip rename
   - Create subvolumes only if missing; do not fail if they already exist
 - Flexible options handling
-  - Preserve existing options like ssd, noatime, autodefrag, etc., while normalizing subvol= options
-  - The script always sets compress=zstd (it does not preserve other compress values)
+  - Preserve existing options like ssd, noatime, autodefrag, etc., while
+    normalizing subvol= options
+  - The script always sets compress=zstd (it does not preserve other compress
+    values)
 - fstab fsck fields
   - Btrfs uses a no-op fsck; the script sets 0 0 for btrfs entries consistently
   - EFI line is preserved as-is
@@ -137,13 +172,16 @@ Plan review, corrections, and guardrails
   - Logs all file reads/changes and command actions
   - Trap interrupts with a warning
 - Environment checks
-  - Requires Debian installer context (/cdrom), root, mounted /target and /target/boot/efi, and btrfs root
+  - Requires Debian installer context (/cdrom), root, mounted /target and
+    /target/boot/efi, and btrfs root
 
 ---
 
 Troubleshooting
+
 - Script says /target is not mounted
-  - In the installer, use the guided install to mount target, or manually mount before running
+  - In the installer, use the guided install to mount target, or manually mount
+    before running
 - Root fstype is not btrfs
   - Revisit partitioning step; ensure the root partition is formatted as btrfs
 - EFI is not vfat
@@ -154,10 +192,12 @@ Troubleshooting
 ---
 
 Development
+
 - Entry point: ./debian-btrfs-boot.sh
-- Style: Bash, set -Eeuo pipefail; colored output with ANSI sequences and emoji icons
+- Style: Bash, set -Eeuo pipefail; colored output with ANSI sequences and emoji
+  icons
 - Changes and logs: install.TIMESTAMP.log in working dir
 
 License
-- MIT — see LICENSE
 
+- MIT — see LICENSE
