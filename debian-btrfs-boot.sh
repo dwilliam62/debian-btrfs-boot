@@ -357,6 +357,20 @@ fi
 # Install the modified fstab
 log STEP "Installing modified fstab"
 cp -f "$MODIFIED_PATH" "$TARGET_ROOT/etc/fstab" && chmod 0644 "$TARGET_ROOT/etc/fstab"
+
+# Copy the install log into the target root directory on success (non-dry-run)
+if [ "$DRY_RUN" = "true" ]; then
+  log WARN "DRY-RUN: would copy $LOG_FILE to $TARGET_ROOT/"
+else
+  if [ -f "$LOG_FILE" ]; then
+    if cp -f "$LOG_FILE" "$TARGET_ROOT/"; then
+      log OK "Copied install log to $TARGET_ROOT/$(basename "$LOG_FILE")"
+    else
+      log WARN "Could not copy install log to target root ($TARGET_ROOT)"
+    fi
+  fi
+fi
+
 log OK "Modification successful. Press CTRL+ALT+F1 to return to the installer and continue."
 exit 0
 
