@@ -47,6 +47,13 @@ log() {
   esac
 }
 
+# Print a multi-line block to stdout and append to log
+print_block() {
+  _block="$1"
+  printf "%s\n" "$_block"
+  printf "%s\n" "$_block" >>"$LOG_FILE"
+}
+
 die() {
   log FAIL "$*"
   exit 1
@@ -175,13 +182,12 @@ BASE_BTRFS_OPTS=$(printf "%s,%s" "${clean_opts#,}" "$comp_opt" | sed 's/^,//;s/,
 
 # Confirmation: show current state
 log STEP "Planned Btrfs subvol layout:"
-cat <<LAYOUT | tee -a "$LOG_FILE"
-@            -> /
+LAYOUT_BLOCK="@            -> /
 @home        -> /home
 @snapshots   -> /.snapshots
 @log         -> /var/log
-@cache       -> /var/cache
-LAYOUT
+@cache       -> /var/cache"
+print_block "$LAYOUT_BLOCK"
 
 if [ "$AUTO_YES" != "true" ]; then
   printf "%b" "$YELLOW"
@@ -311,7 +317,8 @@ $BTRFS_ENTRIES
 "
 
 log INFO "Proposed fstab changes:"
-printf "%s\n" "$BTRFS_ENTRIES" | sed 's/^/  + /' | tee -a "$LOG_FILE"
+PROPOSED_CHANGES=$(printf "%s\n" "$BTRFS_ENTRIES" | sed 's/^/  + /')
+print_block "$PROPOSED_CHANGES"
 
 # Write modified fstab to a temp file first
 MODIFIED_PATH="$TARGET_ROOT/etc/fstab.modified.$(TS)"
@@ -330,7 +337,8 @@ fi
 
 log STEP "Preview of modified fstab ($MODIFIED_PATH):"
 if [ -f "$MODIFIED_PATH" ]; then
-  sed 's/^/    /' "$MODIFIED_PATH" | tee -a "$LOG_FILE"
+  PREVIEW_CONTENT=$(sed 's/^/    /' "$MODIFIED_PATH")
+  print_block "$PREVIEW_CONTENT"
 fi
 
 if [ "$AUTO_YES" != "true" ]; then
