@@ -2,8 +2,6 @@
 
 Leer esto en: [English](README.md) | [Español](README.es.md)
 
-❌🚧 VERSIÓN EN DESARROLLO — NO USE ESTE SCRIPT POR AHORA 🚧❌
-
 - Este proyecto está en desarrollo activo. Úselo bajo su propio riesgo.
 
 SUPUESTOS IMPORTANTES
