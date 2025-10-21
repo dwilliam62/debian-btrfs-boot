@@ -52,8 +52,8 @@ This is before the package installation step.
 
 ## Reminder:
 
-> The boot disk root partiontion must be mounted on `/target`
-> For UEFI also EFI parition must be mounted on `/target/boot`
+> - The boot disk root partiontion must be mounted on `/target`
+> - For UEFI also EFI parition must be mounted on `/target/boot`
 
 ### Expected environment:
 
