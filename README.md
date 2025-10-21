@@ -4,23 +4,28 @@ Read this in: [English](README.md) | [Español](README.es.md)
 
 - This project is under active development. Use at your own risk.
 
-IMPORTANT ASSUMPTIONS
+## IMPORTANT ASSUMPTIONS
+
 - UEFI firmware and GPT partition table are required.
 - Single root mount point (/) on one Btrfs partition (no separate root/home/var partitions expected).
 - No swap space configured. If swap exists, this script may not apply.
 
-Configure a Debian 12/13 system (during install) to use Btrfs subvolumes for /,
-/home, /.snapshots, /var/log, and /var/cache. This repo includes a robust script
-with safety checks, clear colored output, icons, and detailed logging.
+#### This script will configure a Debian 12/13+ system (during install) to use BTRFS subvolumes and support root snashots
 
-- This was created from the JustAGuyLinux YouTube Video
+- / --------> @
+- /home --------> @home
+- /.snapshots --------> @snaspshots
+- /var/log --------> @log
+- /var/cache --------> @cache
+
+- This was created from this JustAGuyLinux YouTube Video
   https://www.youtube.com/watch?v=_zC4S7TA1GI
 
 - by JustAGuyLinux https://www.youtube.com/@JustAGuyLinux
 
 ---
 
-Highlights
+## Highlights
 
 - ✅ Safe and idempotent: backs up fstab, previews changes, and requires
   explicit confirmations.
@@ -32,18 +37,25 @@ Highlights
   results.
 - 🎨 Colorful UX: ANSI-colored messages with icons for clarity.
 
-Screenshots
+### Screenshots
 
 ![Screenshot 1](img/ScreenShot-1.png) ![Screenshot 2](img/ScreenShot-2.png)
 
 ---
 
-When to run Run this script from the Debian Installer shell after you have
-partitioned and formatted the target drive, and the installer has mounted the
-target system at /target and the EFI partition at /target/boot/efi. This is
-typically before the package installation step.
+## When to run:
 
-Expected environment:
+Run this script from the Debian Installer shell (CTRL + ALT + F2) after you have
+partitioned and formatted the target drive, and the installer has mounted the
+target system at /target and the EFI partition at /target/boot/efi.
+This is before the package installation step.
+
+## Reminder:
+
+> The boot disk root partiontion must be mounted on `/target`
+> For UEFI also EFI parition must be mounted on `/target/boot`
+
+### Expected environment:
 
 - Debian 12 or 13 installer
 - GPT partitioning and UEFI firmware (/sys/firmware/efi present)
@@ -52,7 +64,7 @@ Expected environment:
 
 ---
 
-Resulting Btrfs layout
+### Resulting BTRFS layout
 
 - @ -> /
 - @home -> /home
