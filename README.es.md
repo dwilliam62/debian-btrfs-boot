@@ -44,8 +44,8 @@ Ejecute este script desde la consola del instalador de Debian (CTRL + ALT + F2) 
 
 ## Recordatorio:
 
-> La partición raíz del disco de arranque debe montarse en `/target`
-> Para UEFI, la partición EFI también debe montarse en `/target/boot/efi`
+> - La partición raíz del disco de arranque debe montarse en `/target`
+> - Para UEFI, la partición EFI también debe montarse en `/target/boot/efi`
 
 ### Entorno esperado:
 
