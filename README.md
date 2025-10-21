@@ -12,11 +12,11 @@ Read this in: [English](README.md) | [Español](README.es.md)
 
 #### This script will configure a Debian 12/13+ system (during install) to use BTRFS subvolumes and support root snashots
 
-- `/` --------> @
-- `/home` --------> @home
-- `/.snapshots` --------> @snaspshots
-- `/var/log` --------> @log
-- `/var/cache` --------> @cache
+- `/` --------> `@`
+- `/home` --------> `@home`
+- `/.snapshots` --------> `@snaspshots`
+- `/var/log` --------> `@log`
+- `/var/cache` --------> `@cache`
 
 - This was created from this JustAGuyLinux YouTube Video
   https://www.youtube.com/watch?v=_zC4S7TA1GI
