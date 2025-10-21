@@ -12,12 +12,6 @@ Leer esto en: [English](README.md) | [Español](README.es.md)
 
 #### Este script configurará un sistema Debian 12/13+ (durante la instalación) para usar subvolúmenes BTRFS y permitir instantáneas de la raíz
 
-- / --------> @
-- /home --------> @home
-- /.snapshots --------> @snapshots
-- /var/log --------> @log
-- /var/cache --------> @cache
-
 - Creado a partir del video de JustAGuyLinux
   https://www.youtube.com/watch?v=_zC4S7TA1GI
 - por JustAGuyLinux https://www.youtube.com/@JustAGuyLinux
